@@ -2,6 +2,9 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
+  // -----------------------------
+  // Registration form
+  // -----------------------------
   const [form, setForm] = useState({
     student_id: "",
     full_name: "",
@@ -17,6 +20,14 @@ function App() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // -----------------------------
+  // View Student
+  // -----------------------------
+  const [searchId, setSearchId] = useState("");
+  const [student, setStudent] = useState(null);
+  const [viewError, setViewError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -24,6 +35,9 @@ function App() {
     });
   };
 
+  // -----------------------------
+  // Register Student
+  // -----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -80,8 +94,48 @@ function App() {
     }
   };
 
+  // -----------------------------
+  // View Student
+  // -----------------------------
+  const handleViewStudent = async (e) => {
+    e.preventDefault();
+
+    setStudent(null);
+    setViewError("");
+
+    if (!searchId.trim()) {
+      setViewError("Please enter a Student ID.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/students/${searchId.trim()}/`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setViewError(data.detail || "Student not found.");
+        return;
+      }
+
+      setStudent(data);
+    } catch {
+      setViewError("Unable to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container">
+
+      {/* =========================
+          Student Registration
+      ========================== */}
       <div className="card">
         <h1>Student Registration</h1>
 
@@ -178,6 +232,87 @@ function App() {
         {message && <p className="success">{message}</p>}
         {error && <p className="error">{error}</p>}
       </div>
+
+
+      {/* =========================
+          View Student
+      ========================== */}
+      <div className="card">
+        <h1>View Student</h1>
+
+        <form onSubmit={handleViewStudent}>
+          <input
+            type="text"
+            placeholder="Enter Student ID"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
+          />
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Loading..." : "View Student"}
+          </button>
+        </form>
+
+        {viewError && (
+          <p className="error">
+            {viewError}
+          </p>
+        )}
+
+        {student && (
+          <div className="student-details">
+
+            <h2>Student Details</h2>
+
+            <div className="detail-row">
+              <strong>Student ID:</strong>
+              <span>{student.student_id}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Full Name:</strong>
+              <span>{student.full_name}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Email:</strong>
+              <span>{student.email}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Phone:</strong>
+              <span>{student.phone}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Date of Birth:</strong>
+              <span>{student.date_of_birth}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Gender:</strong>
+              <span>{student.gender}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Course:</strong>
+              <span>{student.course}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Year:</strong>
+              <span>{student.year}</span>
+            </div>
+
+            <div className="detail-row">
+              <strong>Created At:</strong>
+              <span>{student.created_at}</span>
+            </div>
+
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

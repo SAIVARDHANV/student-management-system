@@ -54,3 +54,20 @@ class StudentRegistrationSerializer(serializers.ModelSerializer):
         )
 
         return student
+
+class StudentDetailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source="user.email", read_only=True)
+
+    class Meta:
+        model = Student
+        fields = [
+            "student_id",
+            "full_name",
+            "email",
+            "phone",
+            "date_of_birth",
+            "gender",
+            "course",
+            "year",
+            "created_at",
+        ]
