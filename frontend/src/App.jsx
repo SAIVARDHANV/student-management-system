@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import AdminLogin from "./AdminLogin.jsx";
 
 function App() {
   // -----------------------------
@@ -312,6 +313,8 @@ function App() {
           </div>
         )}
       </div>
+
+      <AdminLogin />
 
     </div>
   );
